@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "356083679832",
+    "firebase_url": "https://noter-e31c3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "noter-e31c3",
+    "storage_bucket": "noter-e31c3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356083679832:android:30c401de88f916738e402d",
+        "android_client_info": {
+          "package_name": "com.example.noter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPDPLyCnAEkBalox2__OpR7DM12Yl5NM4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356083679832:android:4d7690cbe281beaf8e402d",
+        "android_client_info": {
+          "package_name": "com.noter.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPDPLyCnAEkBalox2__OpR7DM12Yl5NM4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
