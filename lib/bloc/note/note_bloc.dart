@@ -2,9 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
-import 'package:noter/shared/network/local/local_db_service.dart';
 import 'package:noter/shared/network/remote/firebase_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 part 'note_event.dart';
@@ -12,10 +10,8 @@ part 'note_state.dart';
 
 class NoteBloc extends Bloc<NoteEvent, NoteState> {
   FirebaseService firebaseService = FirebaseService();
-  late LocalDbService localDbService;
 
-  NoteBloc(SharedPreferences prefs) : super(NoteInitial()) {
-    localDbService = LocalDbService(prefs);
+  NoteBloc() : super(NoteInitial()) {
 
     on<NoteEventDeleteNote>((event, emit) async {
         await deleteNote(event, emit);

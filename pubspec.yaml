@@ -47,6 +47,8 @@ dependencies:
   dropdown_textfield: ^1.2.0
   multi_dropdown: ^2.1.4
   quds_popup_menu: ^0.0.1+1
+  flutter_launcher_icons: ^0.13.1
+  flutter_snake_navigationbar: ^0.6.1
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +64,11 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -70,6 +77,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

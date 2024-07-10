@@ -31,23 +31,25 @@ class HomeScreen extends StatelessWidget {
         // mainAxisAlignment: MainAxisAlignment.end,
         children: [
           BlocBuilder<NoteBloc, NoteState>(builder: (context, state) {
-          List<Note> notes = context.read<UserBloc>().user.notes;
-          return ListView.builder(
-              itemCount: notes.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: Card(
-                    child: ListTile(
-                      title: Text(notes[index].title),
-                      subtitle: Text(Document.fromJson(jsonDecode(notes[index].content)).toPlainText()),
-
-                  )),
-                  onTap: (){
-                    Navigator.pushNamed(context, '/home/note', arguments: notes[index]);
-                  },
-                );
-              });
-                    }),
+          // List<Note> notes = context.read<UserBloc>().user.notes;
+          // return ListView.builder(
+          //     itemCount: notes.length,
+          //     itemBuilder: (context, index) {
+          //       return GestureDetector(
+          //         child: Card(
+          //           child: ListTile(
+          //             title: Text(notes[index].title),
+          //             subtitle: Text(Document.fromJson(jsonDecode(notes[index].content)).toPlainText()),
+          //
+          //         )),
+          //         onTap: (){
+          //           Navigator.pushNamed(context, '/home/note', arguments: notes[index]);
+          //         },
+          //       );
+          //     });
+            return Text("noets");
+                    }
+                  ),
           Align(
             alignment: AlignmentDirectional.bottomEnd,
             child: Padding(
@@ -71,7 +73,7 @@ class HomeScreen extends StatelessWidget {
           )
         ],
       ),
-      // bottomNavigationBar: NavBar(crntIndex: 0),
+      bottomNavigationBar: NavBar(crntIndex: 0),
     );
   }
 }

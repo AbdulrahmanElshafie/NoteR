@@ -3,8 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
-import 'package:noter/shared/network/local/local_db_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/network/remote/firebase_service.dart';
 import 'package:noter/models/user.dart';
 
@@ -13,11 +11,9 @@ part 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   FirebaseService firebaseService = FirebaseService();
-  late LocalDbService localDbService;
   late UserAccount user;
 
-  UserBloc(SharedPreferences prefs) : super(UserInitial()) {
-    localDbService = LocalDbService(prefs);
+  UserBloc() : super(UserInitial()) {
     on<UserEventRegister>((event, emit) async {
       await register(event, emit);
     });
@@ -71,10 +67,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       await firebaseService.login(event.email, event.password, salt);
       var userData = await firebaseService.getUserInfo(event.email);
 
-      localDbService.saveUser(
-          event.email, event.password.toString(), userData.data()!['name'],
-          userData.data()!['gender'], userData.data()!['location'], DateTime.fromMillisecondsSinceEpoch(userData.data()!['birthday'].seconds * 1000).toString(), userData.data()!['language']
-      );
       user = UserAccount.fromMap(userData.data() as Map<String, dynamic>);
 
     } on Error catch (e) {
@@ -92,14 +84,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       salt = await firebaseService.register(event.email, event.password);
       await firebaseService.addUserToDb(event.name, event.email, salt,
           event.gender, event.birthday, event.location, event.language);
-      localDbService.saveUser(
-          event.email,
-          event.password,
-          event.name,
-          event.gender,
-          event.location,
-          event.birthday.toString(),
-          event.language);
+
       user = UserAccount(
           event.gender, event.birthday, event.location, event.language,
           name: event.name, email: event.email);

@@ -14,7 +14,7 @@ class SearchScreen extends StatelessWidget {
       body: const Center(
         child: Text('Search'),
       ),
-      bottomNavigationBar: NavBar(crntIndex: 2),
+      bottomNavigationBar: NavBar(crntIndex: 3),
     );
   }
 }

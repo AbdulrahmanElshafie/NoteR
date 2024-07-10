@@ -9,36 +9,33 @@ import 'package:noter/moduls/account/AccountScreen.dart';
 import 'package:noter/moduls/categories/CategoriesScreen.dart';
 import 'package:noter/moduls/login/LoginScreen.dart';
 import 'package:noter/moduls/search/SearchScreen.dart';
-import 'package:noter/moduls/signlogin/SignLoginScreen.dart';
 import 'package:noter/moduls/signup/SignUpScreen.dart';
 import 'package:noter/moduls/home/HomeScreen.dart';
 import 'package:noter/moduls/note/NoteScreen.dart';
 import 'package:noter/moduls/tag/TagScreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'bloc/user/user_bloc.dart';
+import 'moduls/setting/SettingScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  runApp(MyApp(prefs: prefs,));
+  runApp(MyApp());
 }
 
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key, required this.prefs});
-  late SharedPreferences prefs;
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => UserBloc(prefs)),
-        BlocProvider(create: (context) => NoteBloc(prefs)),
-        BlocProvider(create: (context) => TagBloc(prefs)),
+        BlocProvider(create: (context) => UserBloc()),
+        BlocProvider(create: (context) => NoteBloc()),
+        BlocProvider(create: (context) => TagBloc()),
       ],
       child: MaterialApp(
         title: 'NoteR',
@@ -49,17 +46,17 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
             if(context.read<UserBloc>().firebaseService.auth.currentUser == null) {
-              return const Signloginscreen();
+              return Loginscreen();
             }  else {
-              List<String> userDetails = context.read<UserBloc>().localDbService.getUser();
-              context.read<UserBloc>().user = UserAccount(
-                userDetails[3],
-                DateTime.parse(userDetails[5]),
-                userDetails[4],
-                userDetails[6],
-                name: userDetails[1],
-                email: userDetails[0],
-              );
+              // List<String> userDetails = context.read<UserBloc>().localDbService.getUser();
+              // context.read<UserBloc>().user = UserAccount(
+              //   userDetails[3],
+              //   DateTime.parse(userDetails[5]),
+              //   userDetails[4],
+              //   userDetails[6],
+              //   name: userDetails[1],
+              //   email: userDetails[0],
+              // );
               return const HomeScreen();
             }
           },
@@ -74,6 +71,7 @@ class MyApp extends StatelessWidget {
           '/home/categories': (context) => const CategoriesScreen(),
           '/home/tag': (context) => const TagScreen(),
           '/home/search': (context) => const SearchScreen(),
+          '/home/settings': (context) => const SettingScreen(),
         },
       ),
     );

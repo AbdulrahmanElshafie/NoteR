@@ -174,6 +174,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 20,
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        "Have an account? "
+                    ),
+                    TextButton(
+                        onPressed: (){
+                          Navigator.popAndPushNamed(context, '/login');
+                        },
+                        child: Text(
+                            "Login"
+                        )
+                    )
+                  ],
+                )
               ],
             ),
           );

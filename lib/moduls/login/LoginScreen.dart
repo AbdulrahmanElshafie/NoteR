@@ -58,7 +58,27 @@ class Loginscreen extends StatelessWidget {
                         content: Text('Please fill all fields'),
                       ));
                     }
-                  })
+                  }
+                  ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? "
+                  ),
+                  TextButton(
+                      onPressed: (){
+                        Navigator.popAndPushNamed(context, '/signup');
+                      },
+                      child: Text(
+                        "Create an Account"
+                      )
+                  )
+                ],
+              )
             ],
           );
         },
