@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noter/bloc/note/note_bloc.dart';
 import 'package:noter/bloc/tag/tag_bloc.dart';
 import 'package:noter/firebase_options.dart';
-import 'package:noter/models/user.dart';
 import 'package:noter/moduls/account/AccountScreen.dart';
 import 'package:noter/moduls/categories/CategoriesScreen.dart';
 import 'package:noter/moduls/login/LoginScreen.dart';
@@ -17,8 +15,8 @@ import 'package:noter/moduls/tag/TagScreen.dart';
 import 'package:noter/moduls/mainscreen/MainScreen.dart';
 import 'package:noter/shared/network/remote/firebase_service.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:splash_view/source/presentation/pages/splash_view.dart';
-import 'package:splash_view/source/presentation/widgets/done.dart';
+// import 'package:splash_view/source/presentation/pages/splash_view.dart';
+// import 'package:splash_view/source/presentation/widgets/done.dart';
 import 'bloc/user/user_bloc.dart';
 import 'moduls/setting/SettingScreen.dart';
 
@@ -34,6 +32,7 @@ Future<void> main() async {
 }
 
 Widget loader(BuildContext context) {
+  print(context.read<UserBloc>().state);
   FirebaseService firebase = context.read<UserBloc>().firebaseService;
   if (firebase.auth.currentUser == null) {
     return Loginscreen();
@@ -43,7 +42,10 @@ Widget loader(BuildContext context) {
     if (context.read<UserBloc>().state is UserSuccess) {
       return const MainScreen();
     } else {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+          child: CircularProgressIndicator(
+        backgroundColor: Colors.white,
+      ));
     }
   }
 }
@@ -76,7 +78,30 @@ class MyApp extends StatelessWidget {
                 ).matchingBuilder,
               },
             )),
-        home: Builder(builder: (context) => loader(context)),
+        home: BlocBuilder<UserBloc, UserState>(
+          builder: (context, state) {
+            print(state);
+            FirebaseService firebase = context.read<UserBloc>().firebaseService;
+            if (firebase.auth.currentUser == null) {
+              return Loginscreen();
+            } else {
+              if (state is UserInitial) {
+                String email = firebase.auth.currentUser?.email as String;
+                context.read<UserBloc>().add(UserEventLoadUser(email));
+              }
+              if (state is UserSuccess) {
+                return const MainScreen();
+              }
+              if (state is UserCollecting) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                ));
+              }
+              return SizedBox.shrink();
+            }
+          },
+        ),
         debugShowCheckedModeBanner: false,
         routes: {
           '/signup': (context) => const SignUpScreen(),

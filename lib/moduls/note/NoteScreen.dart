@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -13,7 +12,6 @@ import 'package:noter/models/tag.dart';
 class NoteScreen extends StatelessWidget {
   NoteScreen({super.key});
   final QuillController _controller = QuillController.basic();
-  List<ValueItem<String>> tagsOptions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -97,20 +95,21 @@ class NoteScreen extends StatelessWidget {
                       ),
                     tooltip: 'Add Tag',
                     onPressed: () {
-                      tagsOptions.clear();
+                      List<ValueItem<String>> tagsOptions = [];
                       for (var tag in context.read<UserBloc>().user.tags.values) {
                         tagsOptions.add(ValueItem(value: tag.tagId, label: tag.name));
                       }
+                      List<String> selectedTags = note.tags;
+                      print('selected tags init ${selectedTags}');
+
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               Tag newTag = Tag('');
                               TextEditingController tagController = TextEditingController();
-                              
-                              return BlocBuilder<NoteBloc, NoteState>(
+
+                              return BlocBuilder<TagBloc, TagState>(
                                 builder: (context, state) {
-                                  List<String> selectedTags = note.tags;
-                                  print('selected tags init ${selectedTags}');
                                   return AlertDialog(
                                   alignment: Alignment.topCenter,
                                 title: const Text('Add Tag'),
@@ -136,8 +135,10 @@ class NoteScreen extends StatelessWidget {
                                           context.read<TagBloc>().add(TagEventAddTag(email, newTag));
 
                                           // add to selected tags
-                                          selectedTags.add(newTag.tagId);
-
+                                          if(!selectedTags.contains(newTag.tagId)) {
+                                            selectedTags.add(newTag.tagId);
+                                            print('on add new tag & select it ${selectedTags}');
+                                          }
                                           // Navigator.pop(context);
                                         }, child: Text('Add new Tag')),
                                         TextButton(onPressed: (){
@@ -151,9 +152,11 @@ class NoteScreen extends StatelessWidget {
                                       options: tagsOptions,
                                       onOptionSelected: (List<ValueItem> selectedOptions){
                                         for(var option in selectedOptions) {
-                                          Tag t = option.value;
-                                          selectedTags.add(t.tagId);
-                                          print('on select option ${selectedTags}');
+                                          String tagId = option.value as String;
+                                          if(!selectedTags.contains(tagId)) {
+                                            selectedTags.add(tagId);
+                                            print('on select new option ${selectedTags}');
+                                          }
                                         }
                                       },
                                       chipConfig: const ChipConfig(wrapType: WrapType.wrap),
@@ -161,8 +164,8 @@ class NoteScreen extends StatelessWidget {
                                       searchEnabled: true,
                                       clearIcon: const Icon(Icons.clear),
                                       onOptionRemoved: (idx, item){
-                                        Tag t = item.value as Tag;
-                                        selectedTags.remove(t.tagId);
+                                        String tagId = item.value as String;
+                                        selectedTags.remove(tagId);
                                         print('on remove option ${selectedTags}');
                                     },
                                     ),
@@ -178,23 +181,38 @@ class NoteScreen extends StatelessWidget {
                                           }, child: const Text('Cancel')),
                                           const SizedBox(width: 10,),
                                           TextButton(onPressed: (){
-                                            for (var tag in selectedTags) {
-                                              // save local
-                                              context.read<UserBloc>().user.tags[tag]?.addNote(note.noteId);
-                                              context.read<UserBloc>().user.notes[note.noteId]?.addTag(tag);
+                                            print('save selected tags $selectedTags');
+                                            print('save note tags ${note.tags}');
 
-                                              // save cloud
-                                              context.read<NoteBloc>().add(NoteEventAddTag(context.read<UserBloc>().user.email, note.noteId, tag));
+                                            Map<String, Tag> userTags = context.read<UserBloc>().user.tags;
+                                            Map<String, Note> userNotes = context.read<UserBloc>().user.notes;
+
+                                            for (var tag in selectedTags) {
+
+                                              if(!userTags[tag]!.notes.contains(note.noteId)){
+                                                // save to local
+                                                userTags[tag]?.addNote(note.noteId);
+                                                userNotes[note.noteId]?.addTag(tag);
+
+                                                // save to cloud
+                                                context.read<NoteBloc>().add(NoteEventAddTag(context.read<UserBloc>().user.email, note.noteId, tag));
+                                              }
                                             }
+                                            context.read<UserBloc>().user.tags = userTags;
+                                            context.read<UserBloc>().user.notes = userNotes;
+
+                                            userNotes.clear();
+                                            userTags.clear();
+
+                                            print('after save selected tags $selectedTags');
+                                            print('after save note tags ${note.tags}');
 
                                             // some tags has been removed
                                             if(note.tags.length > selectedTags.length) {
-                                              note.tags.sort();
-                                              selectedTags.sort();
 
                                               for(int i = 0; i < note.tags.length; i++) {
 
-                                                if(note.tags[i] != selectedTags[i]) {
+                                                if(!selectedTags.contains(note.tags[i])) {
                                                   // remove from cloud
                                                   context.read<NoteBloc>().add(NoteEventRemoveTag(context.read<UserBloc>().user.email, note.noteId, note.tags[i]));
 
@@ -213,8 +231,8 @@ class NoteScreen extends StatelessWidget {
                                   ],
                                 ),
                               );
-  },
-);
+                                },
+                              );
                             }
                         );
                     },

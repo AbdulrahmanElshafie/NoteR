@@ -18,8 +18,9 @@ class CategoriesScreen extends StatelessWidget {
       },
       itemBuilder: (BuildContext context, IndexPath index) {
         return Text(
+          // context.read<UserBloc>().user.notes[tags.values.toList()[index.section].notes[index.index]]?.title
           "Item ${tags.values.toList()[index.section].notes[index.index]}",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(fontSize: 18),
         );
       },
       groupHeaderBuilder: (BuildContext context, int section) {
@@ -35,6 +36,6 @@ class CategoriesScreen extends StatelessWidget {
       },
       separatorBuilder: (context, index) => SizedBox(height: 10),
       sectionSeparatorBuilder: (context, section) => SizedBox(height: 10),
-    );;
+    );
   }
 }

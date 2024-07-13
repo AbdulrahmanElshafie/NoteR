@@ -92,7 +92,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> loadUser(UserEventLoadUser event, Emitter emit) async {
-    emit(UserLoading());
+    emit(UserCollecting());
     try {
       var userData = await firebaseService.getUserInfo(event.email);
       user = UserAccount.fromMap(userData.data() as Map<String, dynamic>);
@@ -100,7 +100,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       collectNotes(event.email);
 
       collectTags(event.email);
-
 
     } catch (e) {
       emit(UserError(e.toString()));
