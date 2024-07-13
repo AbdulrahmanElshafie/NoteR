@@ -36,7 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               content: Text(state.error),
             ));
           } else if (state is UserLoggedIn) {
-            Navigator.pushNamedAndRemoveUntil(context, '/home', (context) => false);
+            Navigator.pushNamedAndRemoveUntil(context, '/main', (context) => false);
           }
         },
         builder: (context, state) {
@@ -165,6 +165,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 birthday,
                                 gender,
                                 locationController.text.trim()));
+
+
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text('Please fill all fields'),

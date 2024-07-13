@@ -99,23 +99,23 @@ class FirebaseService {
     });
   }
 
-  Future<void> addNoteTag(String email, Note note, Tag tag) async {
+  Future<void> addNoteTag(String email, String noteId, String tagId) async {
     await db
         .collection("users")
         .doc(email)
         .collection("notes")
-        .doc(note.noteId)
+        .doc(noteId)
         .collection("tags")
-        .doc(tag.tagId)
+        .doc(tagId)
         .set({});
 
     db
         .collection('users')
         .doc(email)
         .collection("tags")
-        .doc(tag.tagId)
+        .doc(tagId)
         .collection('notes')
-        .doc(note.noteId)
+        .doc(noteId)
         .set({});
   }
 
@@ -139,6 +139,26 @@ class FirebaseService {
           .doc(notId)
           .get();
 
+  Future<QuerySnapshot<Map<String, dynamic>>> getTagsForNote(
+          String noteId, String email) async =>
+      await db
+          .collection('users')
+          .doc(email)
+          .collection('notes')
+          .doc(noteId)
+          .collection('tags')
+          .get();
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getNotesForTag(
+          String tagId, String email) async =>
+      await db
+          .collection('users')
+          .doc(email)
+          .collection('tags')
+          .doc(tagId)
+          .collection('notes')
+          .get();
+
   // Update
   Future<void> updateUserInfo(
       String email, String name, String location, String language) async {
@@ -148,7 +168,7 @@ class FirebaseService {
         .update({"name": name, "location": location, "language": language});
   }
 
-  Future<void> updateTagDetails(String email, Note note, Tag tag) async {
+  Future<void> updateTagDetails(String email, Tag tag) async {
     await db
         .collection("users")
         .doc(email)
@@ -216,23 +236,23 @@ class FirebaseService {
     await record.delete();
   }
 
-  Future<void> deleteNoteTag(String email, Note note, Tag tag) async {
+  Future<void> deleteNoteTag(String email, String noteId, String tagId) async {
     await db
         .collection("users")
         .doc(email)
         .collection("notes")
-        .doc(note.noteId)
+        .doc(noteId)
         .collection("tags")
-        .doc(tag.tagId)
+        .doc(tagId)
         .delete();
 
     await db
         .collection("users")
         .doc(email)
         .collection("tags")
-        .doc(tag.tagId)
+        .doc(tagId)
         .collection("notes")
-        .doc(note.noteId)
+        .doc(noteId)
         .delete();
   }
 }

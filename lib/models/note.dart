@@ -6,7 +6,6 @@
 - AddTage(tags) # add tags to the note -> In Progress
  */
 
-import 'package:noter/models/tag.dart';
 import 'dart:math';
 
 
@@ -25,22 +24,18 @@ class Note{
   }
 
   Note.fromMap(Map<String, dynamic> map){
-    noteId = map['noteId'];
     title = map['title'];
     content = map['content'];
     creationDate = DateTime.fromMillisecondsSinceEpoch(map['creationDate'].seconds * 1000);
     modificationDate = DateTime.fromMillisecondsSinceEpoch(map['modificationDate'].seconds * 1000);
-    for(int i = 0; i < map['tags'].length; i++){
-      tags.add(map['tags'][i]['tagId']);
-    }
   }
 
-  void addTag(Tag newTag){
-    tags.add(newTag.tagId);
+  void addTag(String tagID){
+    tags.add(tagID);
   }
 
-  void removeTag(Tag tag){
-    tags.remove(tag.tagId);
+  void removeTag(String tagID){
+    tags.remove(tagID);
   }
 
   List<String> getTags() => tags;

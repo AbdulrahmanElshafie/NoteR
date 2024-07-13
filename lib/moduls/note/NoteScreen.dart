@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:noter/bloc/note/note_bloc.dart';
+import 'package:noter/bloc/tag/tag_bloc.dart';
 import 'package:noter/bloc/user/user_bloc.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
@@ -12,7 +13,7 @@ import 'package:noter/models/tag.dart';
 class NoteScreen extends StatelessWidget {
   NoteScreen({super.key});
   final QuillController _controller = QuillController.basic();
-  List<ValueItem<Tag>> tagsOptions = [];
+  List<ValueItem<String>> tagsOptions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +32,16 @@ class NoteScreen extends StatelessWidget {
                   onPressed: () {
                     note.modificationDate = DateTime.now();
                     note.content = jsonEncode(_controller.document.toDelta().toJson());
-                    context.read<UserBloc>().user.addNote(note);
-                    context.read<NoteBloc>().add(NoteEventSaveNote(context.read<UserBloc>().user.email, note));
+
+                    if(context.read<UserBloc>().user.notes.containsKey(note.noteId)) {
+                      context.read<NoteBloc>().add(NoteEventUpdateNote(context.read<UserBloc>().user.email, note));
+
+                    } else{
+                      context.read<UserBloc>().user.addNote(note);
+                      context.read<NoteBloc>().add(NoteEventAddNote(context.read<UserBloc>().user.email, note));
+                    }
                     Navigator.pop(context);
-                    },
+                  },
                   icon: const Icon(
                   Icons.arrow_back,
                 )
@@ -91,10 +98,8 @@ class NoteScreen extends StatelessWidget {
                     tooltip: 'Add Tag',
                     onPressed: () {
                       tagsOptions.clear();
-                      for(int i = 0; i < context.read<UserBloc>().user.tags.length; i++) {
-                        Tag t = context.read<UserBloc>().user.tags[i];
-                        tagsOptions.add(ValueItem(value: t, label: t.name));
-
+                      for (var tag in context.read<UserBloc>().user.tags.values) {
+                        tagsOptions.add(ValueItem(value: tag.tagId, label: tag.name));
                       }
                         showDialog(
                             context: context,
@@ -104,7 +109,9 @@ class NoteScreen extends StatelessWidget {
                               
                               return BlocBuilder<NoteBloc, NoteState>(
                                 builder: (context, state) {
-                                return AlertDialog(
+                                  List<String> selectedTags = note.tags;
+                                  print('selected tags init ${selectedTags}');
+                                  return AlertDialog(
                                   alignment: Alignment.topCenter,
                                 title: const Text('Add Tag'),
                                 content: Column(
@@ -121,10 +128,17 @@ class NoteScreen extends StatelessWidget {
                                     Row(
                                       children: [
                                         TextButton(onPressed: (){
-                                          context.read<UserBloc>().firebaseService.addTagToDb(context.read<UserBloc>().user.email, newTag);
-                                          context.read<NoteBloc>().add(NoteEventAddTag(context.read<UserBloc>().user.email, note, newTag));
+                                          // add tag locally
                                           context.read<UserBloc>().user.addTag(newTag);
-                                          Navigator.pop(context);
+
+                                          // add tag to cloud
+                                          String email = context.read<UserBloc>().user.email;
+                                          context.read<TagBloc>().add(TagEventAddTag(email, newTag));
+
+                                          // add to selected tags
+                                          selectedTags.add(newTag.tagId);
+
+                                          // Navigator.pop(context);
                                         }, child: Text('Add new Tag')),
                                         TextButton(onPressed: (){
                                           tagController.clear();
@@ -133,19 +147,69 @@ class NoteScreen extends StatelessWidget {
                                       ],
                                     ),
                                     MultiSelectDropDown(
+                                      selectedOptions: selectedTags.map((e) => ValueItem(value: e, label: context.read<UserBloc>().user.tags[e]?.name as String)).toList(),
                                       options: tagsOptions,
                                       onOptionSelected: (List<ValueItem> selectedOptions){
                                         for(var option in selectedOptions) {
                                           Tag t = option.value;
-                                          context.read<NoteBloc>().add(NoteEventAddTag(context.read<UserBloc>().user.email, note, t));
+                                          selectedTags.add(t.tagId);
+                                          print('on select option ${selectedTags}');
                                         }
                                       },
                                       chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                                       dropdownHeight: 300,
                                       searchEnabled: true,
-                                      clearIcon: Icon(Icons.clear),
-                                    
+                                      clearIcon: const Icon(Icons.clear),
+                                      onOptionRemoved: (idx, item){
+                                        Tag t = item.value as Tag;
+                                        selectedTags.remove(t.tagId);
+                                        print('on remove option ${selectedTags}');
+                                    },
                                     ),
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Row(
+                                        children: [
+                                          TextButton(onPressed: (){
+                                            tagController.clear();
+                                            selectedTags = note.tags;
+
+                                            Navigator.pop(context);
+                                          }, child: const Text('Cancel')),
+                                          const SizedBox(width: 10,),
+                                          TextButton(onPressed: (){
+                                            for (var tag in selectedTags) {
+                                              // save local
+                                              context.read<UserBloc>().user.tags[tag]?.addNote(note.noteId);
+                                              context.read<UserBloc>().user.notes[note.noteId]?.addTag(tag);
+
+                                              // save cloud
+                                              context.read<NoteBloc>().add(NoteEventAddTag(context.read<UserBloc>().user.email, note.noteId, tag));
+                                            }
+
+                                            // some tags has been removed
+                                            if(note.tags.length > selectedTags.length) {
+                                              note.tags.sort();
+                                              selectedTags.sort();
+
+                                              for(int i = 0; i < note.tags.length; i++) {
+
+                                                if(note.tags[i] != selectedTags[i]) {
+                                                  // remove from cloud
+                                                  context.read<NoteBloc>().add(NoteEventRemoveTag(context.read<UserBloc>().user.email, note.noteId, note.tags[i]));
+
+                                                  // remove from local
+                                                  context.read<UserBloc>().user.tags[note.tags[i]]?.removeNote(note.noteId);
+                                                  context.read<UserBloc>().user.notes[note.noteId]?.removeTag(note.tags[i]);
+                                                }
+                                              }
+                                            }
+
+                                            Navigator.pop(context);
+                                          }, child: const Text('Save')),
+                                        ]
+                                      ),
+                                    )
                                   ],
                                 ),
                               );
@@ -159,11 +223,18 @@ class NoteScreen extends StatelessWidget {
                     icon: const Icon(Icons.save),
                     tooltip: 'Save',
                     onPressed: () {
-                      context.read<UserBloc>().user.addNote(note);
+
                       note.modificationDate = DateTime.now();
                       note.content = jsonEncode(_controller.document.toDelta().toJson());
-                      context.read<NoteBloc>().add(NoteEventSaveNote(context.read<UserBloc>().user.email, note));
-                      print(context.read<UserBloc>().user.notes);
+
+                      if(context.read<UserBloc>().user.notes.containsKey(note.noteId)) {
+                        context.read<NoteBloc>().add(NoteEventUpdateNote(context.read<UserBloc>().user.email, note));
+
+                      } else{
+                        context.read<UserBloc>().user.addNote(note);
+                        context.read<NoteBloc>().add(NoteEventAddNote(context.read<UserBloc>().user.email, note));
+                      }
+
                     },
                   ),
                   QuillToolbarCustomButtonOptions(

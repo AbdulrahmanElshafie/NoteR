@@ -49,6 +49,9 @@ dependencies:
   quds_popup_menu: ^0.0.1+1
   flutter_launcher_icons: ^0.13.1
   flutter_snake_navigationbar: ^0.6.1
+  page_transition: ^2.1.0
+  group_list_view: ^1.1.1
+  splash_view: ^2.0.1
 
 dev_dependencies:
   flutter_test:

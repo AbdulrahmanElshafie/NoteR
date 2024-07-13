@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,11 @@ import 'package:noter/moduls/signup/SignUpScreen.dart';
 import 'package:noter/moduls/home/HomeScreen.dart';
 import 'package:noter/moduls/note/NoteScreen.dart';
 import 'package:noter/moduls/tag/TagScreen.dart';
+import 'package:noter/moduls/mainscreen/MainScreen.dart';
+import 'package:noter/shared/network/remote/firebase_service.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:splash_view/source/presentation/pages/splash_view.dart';
+import 'package:splash_view/source/presentation/widgets/done.dart';
 import 'bloc/user/user_bloc.dart';
 import 'moduls/setting/SettingScreen.dart';
 
@@ -21,10 +27,26 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  // if(FirebaseAuth.instance.currentUser != null){
+  //   context.read<UserBloc>().add(UserEventLoadUser(email));
+  // }
   runApp(MyApp());
 }
 
+Widget loader(BuildContext context) {
+  FirebaseService firebase = context.read<UserBloc>().firebaseService;
+  if (firebase.auth.currentUser == null) {
+    return Loginscreen();
+  } else {
+    String email = firebase.auth.currentUser?.email as String;
+    context.read<UserBloc>().add(UserEventLoadUser(email));
+    if (context.read<UserBloc>().state is UserSuccess) {
+      return const MainScreen();
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
+  }
+}
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -40,40 +62,75 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'NoteR',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        home: BlocBuilder<UserBloc, UserState>(
-          builder: (context, state) {
-            if(context.read<UserBloc>().firebaseService.auth.currentUser == null) {
-              return Loginscreen();
-            }  else {
-              // List<String> userDetails = context.read<UserBloc>().localDbService.getUser();
-              // context.read<UserBloc>().user = UserAccount(
-              //   userDetails[3],
-              //   DateTime.parse(userDetails[5]),
-              //   userDetails[4],
-              //   userDetails[6],
-              //   name: userDetails[1],
-              //   email: userDetails[0],
-              // );
-              return const HomeScreen();
-            }
-          },
-        ),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            useMaterial3: true,
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: PageTransition(
+                  type: PageTransitionType.fade,
+                  child: this,
+                ).matchingBuilder,
+                TargetPlatform.iOS: PageTransition(
+                  type: PageTransitionType.fade,
+                  child: this,
+                ).matchingBuilder,
+              },
+            )),
+        home: Builder(builder: (context) => loader(context)),
         debugShowCheckedModeBanner: false,
         routes: {
           '/signup': (context) => const SignUpScreen(),
           '/login': (context) => Loginscreen(),
-          '/home': (context) => const HomeScreen(),
-          '/home/account': (context) => const AccountScreen(),
-          '/home/note': (context) => NoteScreen(),
-          '/home/categories': (context) => const CategoriesScreen(),
-          '/home/tag': (context) => const TagScreen(),
-          '/home/search': (context) => const SearchScreen(),
-          '/home/settings': (context) => const SettingScreen(),
+          '/main': (context) => const MainScreen(),
+          '/main/home': (context) => const HomeScreen(),
+          '/main/account': (context) => const AccountScreen(),
+          '/main/note': (context) => NoteScreen(),
+          '/main/categories': (context) => const CategoriesScreen(),
+          '/main/tag': (context) => const TagScreen(),
+          '/main/search': (context) => const SearchScreen(),
+          '/main/settings': (context) => const SettingScreen(),
         },
       ),
     );
   }
 }
+// BlocBuilder<UserBloc, UserState>
+// (
+// builder: (context, state) {
+// FirebaseService firebase = context.read<UserBloc>().firebaseService;
+// if (firebase.auth.currentUser == null) {
+// return Loginscreen();
+// } else {
+// String email = firebase.auth.currentUser?.email as String;
+// context.read<UserBloc>().add(UserEventLoadUser(email));
+// if (context.read<UserBloc>().state is UserLoading) {
+// return const Center(child: CircularProgressIndicator());
+// } else if (context.read<UserBloc>().state is UserError) {
+// return const Center(child: Text(
+// 'Something went wrong',
+// )
+// );
+// } else {
+// return const MainScreen();
+// }
+// }
+// // return const MainScreen();
+// },
+// )
+// BlocListener<UserBloc, UserState>(
+// listener: (context, state) {
+// var firebase = context.read<UserBloc>().firebaseService;
+//
+// if (firebase.auth.currentUser == null) {
+// Navigator.pushNamedAndRemoveUntil(
+// context, '/login', (route) => false);
+// } else{
+// String email = firebase.auth.currentUser?.email as String;
+// context.read<UserBloc>().add(UserEventLoadUser(email));
+// }
+// if (state is UserLoggedIn) {
+// Navigator.pushNamedAndRemoveUntil(
+// context, '/main', (route) => false);
+// }
+// },
+// )

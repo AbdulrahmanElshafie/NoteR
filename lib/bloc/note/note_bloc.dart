@@ -12,26 +12,28 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
   FirebaseService firebaseService = FirebaseService();
 
   NoteBloc() : super(NoteInitial()) {
+    on<NoteEventUpdateNote>((event, emit) async {
+      await saveNote(event, emit);
+    });
+
+    on<NoteEventAddNote>((event, emit) async {
+      await saveNote(event, emit);
+    });
 
     on<NoteEventDeleteNote>((event, emit) async {
         await deleteNote(event, emit);
     });
-    on<NoteEventUpdateNote>((event, emit) async {
-        await updateNote(event, emit);
-    });
-    on<NoteEventGetNote>((event, emit) async {
-        await getNote(event, emit);
-    });
+
+    // on<NoteEventGetNote>((event, emit) async {
+    //     await getNote(event, emit);
+    // });
 
     on<NoteEventAddTag>((event, emit) async {
       await addTag(event, emit);
     });
+
     on<NoteEventRemoveTag>((event, emit) async {
       await removeTag(event, emit);
-    });
-
-    on<NoteEventSaveNote>((event, emit) async {
-      await saveNote(event, emit);
     });
 
   }
@@ -40,14 +42,27 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     emit(SavingNote());
 
     try {
-      await firebaseService.addNoteToDb(event.email, event.note);
+      if(event is NoteEventAddNote) {
+        await firebaseService.addNoteToDb(event.email, event.note);
+
+      } else if(event is NoteEventUpdateNote) {
+        await firebaseService.updateNoteDetails(event.email, event.note);
+
+      }
+
+      if(event.note.tags.isNotEmpty){
+        for (var tagId in event.note.tags) {
+          await firebaseService.addNoteTag(event.email, event.note.noteId, tagId);
+        }
+
+      }
     } catch (e) {
-      emit(NoteNotSaved());
+
       emit(NoteError(e.toString()));
       return;
     }
 
-    emit(NoteSaved());
+    emit(NoteSuccess('Note Saved Successfully!'));
   }
 
   Future<void> deleteNote(NoteEventDeleteNote event, Emitter emit) async {
@@ -55,63 +70,56 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
 
     try {
       await firebaseService.deleteNote(event.email, event.note);
+
     } catch (e) {
       emit(NoteError(e.toString()));
     }
 
-    emit(NoteDeleted());
+    emit(NoteSuccess('Note Deleted Successfully!'));
   }
 
-  Future<void> updateNote(NoteEventUpdateNote event, Emitter emit) async {
-    emit(UpdateNote());
-
-    try {
-      await firebaseService.updateNoteDetails(event.email, event.note);
-    } catch (e) {
-      emit(NoteError(e.toString()));
-      return;
-    }
-
-    emit(NoteSaved());
-  }
-
-  Future<Note> getNote(NoteEventGetNote event, Emitter emit) async {
-    Note note = Note();
-    emit(GetNote());
-    emit(NoteLoading());
-    try {
-      var doc = await firebaseService.readNote(event.email, event.note.noteId);
-      note = Note.fromMap(doc.data() as Map<String, dynamic>);
-      emit(NoteLoaded());
-      return note;
-    } catch (e) {
-      emit(NoteError(e.toString()));
-      return note;
-    }
-  }
+  // Future<Note> getNote(NoteEventGetNote event, Emitter emit) async {
+  //   Note note = Note();
+  //
+  //   emit(GetNote());
+  //   emit(NoteLoading());
+  //
+  //   try {
+  //     var doc = await firebaseService.readNote(event.email, event.note.noteId);
+  //
+  //     note = Note.fromMap(doc.data() as Map<String, dynamic>);
+  //     emit(NoteLoaded());
+  //     return note;
+  //   } catch (e) {
+  //     emit(NoteError(e.toString()));
+  //     return note;
+  //   }
+  // }
 
   Future<void> addTag(NoteEventAddTag event, Emitter emit) async {
     emit(AddTag());
 
     try {
-      await firebaseService.addNoteTag(event.email, event.note, event.tag);
+      await firebaseService.addNoteTag(event.email, event.noteId, event.tagId);
+
     } catch (e) {
       emit(NoteError(e.toString()));
     }
 
-    emit(NoteSaved());
+    emit(NoteSuccess('Add Tag Successfully!'));
   }
 
   Future<void> removeTag(NoteEventRemoveTag event, Emitter emit) async {
     emit(RemoveTag());
 
     try {
-      await firebaseService.deleteNoteTag(event.email, event.note, event.tag);
+      await firebaseService.deleteNoteTag(event.email, event.noteId, event.tagId);
+
     } catch (e) {
       emit(NoteError(e.toString()));
     }
 
-    emit(NoteSaved());
+    emit(NoteSuccess('Removed Tag Successfully!'));
   }
 
 

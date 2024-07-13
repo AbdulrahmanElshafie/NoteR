@@ -50,13 +50,63 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       await getTags(event, emit);
     });
 
-
+    on<UserEventLoadUser>((event, emit) async {
+      await loadUser(event, emit);
+    });
 
   }
 
+  void collectNotes(String email) async {
+    var notes = await firebaseService.getNotes(email);
 
+    for (int i = 0; i < notes.docs.length; i++) {
+      Note note = Note.fromMap(notes.docs[i].data());
+      note.noteId = notes.docs[i].id;
+
+      var tags = await firebaseService.getTagsForNote(note.noteId, email);
+      for(int j = 0; j < tags.docs.length; j++){
+        note.addTag(tags.docs[i].id);
+      }
+
+      user.addNote(note);
+    }
+  }
+
+  void collectTags(String email) async {
+    var tags = await firebaseService.getTags(email);
+
+    for (int i = 0; i < tags.docs.length; i++) {
+      Tag tag = Tag.fromMap(tags.docs[i].data());
+      tag.tagId = tags.docs[i].id;
+
+      var notes = await firebaseService.getNotesForTag(tag.name, email);
+      for(int j = 0; j < notes.docs.length; j++){
+        tag.addNote(notes.docs[i].id);
+      }
+
+      user.addTag(tag);
+    }
+  }
   void logout() {
     firebaseService.logout();
+  }
+
+  Future<void> loadUser(UserEventLoadUser event, Emitter emit) async {
+    emit(UserLoading());
+    try {
+      var userData = await firebaseService.getUserInfo(event.email);
+      user = UserAccount.fromMap(userData.data() as Map<String, dynamic>);
+
+      collectNotes(event.email);
+
+      collectTags(event.email);
+
+
+    } catch (e) {
+      emit(UserError(e.toString()));
+      return;
+    }
+    emit(UserSuccess('User Loaded Successfully'));
   }
 
   Future<void> login(UserEventLogin event, Emitter emit) async {
@@ -65,9 +115,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       salt = await firebaseService.getSalt(event.email);
       await firebaseService.login(event.email, event.password, salt);
-      var userData = await firebaseService.getUserInfo(event.email);
 
+      var userData = await firebaseService.getUserInfo(event.email);
       user = UserAccount.fromMap(userData.data() as Map<String, dynamic>);
+
+      collectNotes(event.email);
+
+      collectTags(event.email);
+
 
     } on Error catch (e) {
       emit(UserError(e.toString()));
@@ -144,11 +199,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> getNotes(UserEventGetNotes event, Emitter emit) async {
     emit(UserLoading());
     try {
-      var notes = await firebaseService.getNotes(event.email);
-      for(var element in notes.docs) {
-        Note note = Note.fromMap(element.data());
-        user.notes.add(note);
-      }
+      collectNotes(event.email);
     } catch (e) {
       emit(UserError(e.toString()));
       return;
@@ -159,11 +210,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> getTags(UserEventGetTags event, Emitter emit) async {
     emit(UserLoading());
     try {
-      var tags = await firebaseService.getTags(event.email);
-      for(var element in tags.docs) {
-        Tag tag = Tag.fromMap(element.data());
-        user.tags.add(tag);
-      }
+      collectTags(event.email);
     } catch (e) {
       emit(UserError(e.toString()));
       return;

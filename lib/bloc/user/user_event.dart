@@ -60,4 +60,9 @@ final class UserEventGetTags extends UserEvent {
   UserEventGetTags(this.email);
 }
 
+final class UserEventLoadUser extends UserEvent{
+  final String email;
+
+  UserEventLoadUser(this.email);
+}
 

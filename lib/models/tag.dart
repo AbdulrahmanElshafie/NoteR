@@ -8,13 +8,12 @@
  */
 
 import 'dart:math';
-import 'package:noter/models/note.dart';
 
 class Tag{
   late String name, tagId;
   late DateTime creationDate, modificationDate;
   int numNotesAssociatedWith = 0;
-  List<String> associatedNote = [];
+  List<String> notes = [];
 
   Tag(this.name){
     tagId = Random.secure().nextInt(1000000000).toString();
@@ -24,30 +23,25 @@ class Tag{
 
   Tag.fromMap(Map<String, dynamic> map){
     name = map['name'];
-    tagId = map['tagId'];
     creationDate = DateTime.fromMillisecondsSinceEpoch(map['creationDate'].seconds * 1000);
     modificationDate = DateTime.fromMillisecondsSinceEpoch(map['modificationDate'].seconds * 1000);
-    for(int i = 0; i < map['associatedNote'].length; i++){
-      associatedNote.add(map['associatedNote'][i]['noteId']);
-      numNotesAssociatedWith++;
-    }
   }
 
-  void addNote(Note newNote){
-    associatedNote.add(newNote.noteId);
+  void addNote(String noteID){
+    notes.add(noteID);
     numNotesAssociatedWith++;
 
   }
 
-  void removeNote(Note note){
-    associatedNote.remove(note.noteId);
+  void removeNote(String noteID){
+    notes.remove(noteID);
     numNotesAssociatedWith--;
   }
 
-  List<String> getNotes() => associatedNote;
+  List<String> getNotes() => notes;
 
   void deleteTag(){
-    associatedNote.clear();
+    notes.clear();
     numNotesAssociatedWith = 0;
   }
 

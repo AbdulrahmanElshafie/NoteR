@@ -17,16 +17,9 @@ final class NoteSuccess extends NoteState {
   NoteSuccess(this.success);
 }
 
-final class UpdateNote extends NoteState{}
 final class DeleteNote extends NoteState{}
-final class GetNote extends NoteState{}
-
+final class SavingNote extends NoteState{}
+// final class GetNote extends NoteState{}
 
 final class AddTag extends NoteState{}
 final class RemoveTag extends NoteState{}
-
-
-final class SavingNote extends NoteState{}
-final class NoteSaved extends NoteState{}
-final class NoteNotSaved extends NoteState{}
-final class NoteDeleted extends NoteState{}

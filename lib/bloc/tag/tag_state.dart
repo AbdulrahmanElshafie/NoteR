@@ -17,9 +17,10 @@ final class TagSuccess extends TagState {
   TagSuccess(this.success);
 }
 
-final class CreateTag extends TagState{}
-final class UpdateTag extends TagState{}
 final class DeleteTag extends TagState{}
-final class GetTag extends TagState{}
+final class SavingTag extends TagState{}
+// final class GetTag extends TagState{}
 
+final class AddTag extends TagState{}
+final class RemoveTag extends TagState{}
 

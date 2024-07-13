@@ -25,7 +25,8 @@ class Loginscreen extends StatelessWidget {
               content: Text(state.error),
             ));
           } else if (state is UserLoggedIn) {
-            Navigator.pushNamedAndRemoveUntil(context, '/home', (context) => false);
+            BlocProvider.of<UserBloc>(context).add(UserEventLoadUser(emailController.text.trim()));
+            Navigator.pushNamedAndRemoveUntil(context, '/main', (context) => false);
           }
         },
         builder: (context, state) {
