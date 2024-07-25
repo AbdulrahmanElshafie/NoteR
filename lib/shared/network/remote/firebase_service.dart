@@ -5,6 +5,7 @@ import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
 import 'package:noter/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:encrypt/encrypt.dart';
 
 class FirebaseService {
   final auth = FirebaseAuth.instance;
@@ -17,15 +18,22 @@ class FirebaseService {
   }
 
   // Authentication
-  Future<String> register(String email, String password) async {
-    String salt = await FlutterBcrypt.salt();
-    String passwordHash =
-        await FlutterBcrypt.hashPw(password: password, salt: salt);
+  Future<List<String>> register(String email, String password) async {
+    final key = Key.fromSecureRandom(32);
+    final salt = IV.fromLength(16);
+
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
+
+    final encrypted = encrypter.encrypt(password, iv: salt);
+
+    // String salt = await FlutterBcrypt.salt();
+    // String passwordHash =
+    //     await FlutterBcrypt.hashPw(password: password, salt: salt);
 
     await auth.createUserWithEmailAndPassword(
-        email: email, password: passwordHash);
+        email: email, password: encrypted.base64);
 
-    return salt;
+    return [salt.base64, key.base64];
   }
 
   Future<String> getSalt(String email) async {
@@ -35,10 +43,27 @@ class FirebaseService {
     return salt;
   }
 
-  Future<void> login(String email, String password, String salt) async {
-    String passwordHash =
-        await FlutterBcrypt.hashPw(password: password, salt: salt);
-    await auth.signInWithEmailAndPassword(email: email, password: passwordHash);
+  Future<String> getKey(String email) async {
+    String salt = await db.collection('salts').doc(email).get().then((value) {
+      return value.data()?['key'];
+    });
+    return salt;
+  }
+
+  Future<void> login(String email, String password, String saltBase64,
+      String keyBase64) async {
+    final key = Key.fromBase64(keyBase64);
+    final salt = IV.fromBase64(saltBase64);
+
+    final encrypter = Encrypter(AES(key));
+
+    final encrypted = encrypter.encrypt(password, iv: salt);
+
+    // String passwordHash =
+    //     await FlutterBcrypt.hashPw(password: password, salt: salt);
+
+    await auth.signInWithEmailAndPassword(
+        email: email, password: encrypted.base64);
   }
 
   Future<void> logout() async {
@@ -56,6 +81,7 @@ class FirebaseService {
       String name,
       String email,
       String salt,
+      String key,
       String gender,
       DateTime birthday,
       String location,
@@ -69,7 +95,7 @@ class FirebaseService {
       "language": language,
     });
 
-    await db.collection('salts').doc(email).set({'salt': salt});
+    await db.collection('salts').doc(email).set({'salt': salt, 'key': key});
   }
 
   Future<void> addTagToDb(String email, Tag tag) async {
@@ -95,7 +121,8 @@ class FirebaseService {
       "title": note.title,
       "content": note.content,
       "creationDate": note.creationDate,
-      "modificationDate": note.modificationDate
+      "modificationDate": note.modificationDate,
+      'embeddings': note.embeddings
     });
   }
 
@@ -187,6 +214,7 @@ class FirebaseService {
       "title": note.title,
       "content": note.content,
       "modificationDate": note.modificationDate,
+      'embeddings': note.embeddings
     });
   }
 

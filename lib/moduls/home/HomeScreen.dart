@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -16,8 +17,17 @@ class HomeScreen extends StatelessWidget {
       // mainAxisAlignment: MainAxisAlignment.end,
       children: [
         BlocBuilder<NoteBloc, NoteState>(builder: (context, state) {
-          List<Note> notes =
-              context.read<UserBloc>().user.notes.values.toList();
+          UserState userState = context.read<UserBloc>().state;
+          List<Note> notes = [];
+          if (userState is UserCollecting) {
+            return const Center(
+                child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+            ));
+          }
+          if (userState is UserSuccess) {
+            notes = context.read<UserBloc>().user.notes.values.toList();
+          }
           if (notes.isNotEmpty) {
             return ListView.builder(
                 itemCount: notes.length,

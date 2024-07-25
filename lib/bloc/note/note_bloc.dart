@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:noter/models/note.dart';
-import 'package:noter/models/tag.dart';
 import 'package:noter/shared/network/remote/firebase_service.dart';
 
 
@@ -23,10 +22,6 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<NoteEventDeleteNote>((event, emit) async {
         await deleteNote(event, emit);
     });
-
-    // on<NoteEventGetNote>((event, emit) async {
-    //     await getNote(event, emit);
-    // });
 
     on<NoteEventAddTag>((event, emit) async {
       await addTag(event, emit);
@@ -77,24 +72,6 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
 
     emit(NoteSuccess('Note Deleted Successfully!'));
   }
-
-  // Future<Note> getNote(NoteEventGetNote event, Emitter emit) async {
-  //   Note note = Note();
-  //
-  //   emit(GetNote());
-  //   emit(NoteLoading());
-  //
-  //   try {
-  //     var doc = await firebaseService.readNote(event.email, event.note.noteId);
-  //
-  //     note = Note.fromMap(doc.data() as Map<String, dynamic>);
-  //     emit(NoteLoaded());
-  //     return note;
-  //   } catch (e) {
-  //     emit(NoteError(e.toString()));
-  //     return note;
-  //   }
-  // }
 
   Future<void> addTag(NoteEventAddTag event, Emitter emit) async {
     emit(AddTag());

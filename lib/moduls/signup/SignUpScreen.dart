@@ -53,11 +53,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   'Sign Up',
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
-                textBox(text: 'Name', controller: nameController),
+                textBox(labelText: 'Name', controller: nameController),
                 const SizedBox(
                   height: 20,
                 ),
-                textBox(text: 'Email', controller: emailController),
+                textBox(labelText: 'Email', controller: emailController),
                 const SizedBox(
                   height: 20,
                 ),
@@ -127,7 +127,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                textBox(text: 'Location', controller: locationController),
+                textBox(labelText: 'Location', controller: locationController),
                 const SizedBox(
                   height: 20,
                 ),
@@ -145,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                textBox(text: 'Password', controller: passwordController),
+                textBox(labelText: 'Password', controller: passwordController),
                 const SizedBox(
                   height: 20,
                 ),

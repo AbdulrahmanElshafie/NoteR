@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,36 +20,28 @@ import 'package:noter/shared/network/remote/firebase_service.dart';
 import 'package:page_transition/page_transition.dart';
 // import 'package:splash_view/source/presentation/pages/splash_view.dart';
 // import 'package:splash_view/source/presentation/widgets/done.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'bloc/user/user_bloc.dart';
 import 'moduls/setting/SettingScreen.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // if(FirebaseAuth.instance.currentUser != null){
-  //   context.read<UserBloc>().add(UserEventLoadUser(email));
-  // }
+  Gemini.init(apiKey: 'AIzaSyAEBjApRLFyoXX-R9I73PKRxR9UnynASnw');
+
   runApp(MyApp());
+
 }
 
-Widget loader(BuildContext context) {
-  print(context.read<UserBloc>().state);
-  FirebaseService firebase = context.read<UserBloc>().firebaseService;
-  if (firebase.auth.currentUser == null) {
+Widget start() {
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  if (firebaseAuth.currentUser == null) {
     return Loginscreen();
   } else {
-    String email = firebase.auth.currentUser?.email as String;
-    context.read<UserBloc>().add(UserEventLoadUser(email));
-    if (context.read<UserBloc>().state is UserSuccess) {
-      return const MainScreen();
-    } else {
-      return const Center(
-          child: CircularProgressIndicator(
-        backgroundColor: Colors.white,
-      ));
-    }
+    return const MainScreen();
   }
 }
 
@@ -80,7 +75,6 @@ class MyApp extends StatelessWidget {
             )),
         home: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
-            print(state);
             FirebaseService firebase = context.read<UserBloc>().firebaseService;
             if (firebase.auth.currentUser == null) {
               return Loginscreen();
@@ -89,16 +83,7 @@ class MyApp extends StatelessWidget {
                 String email = firebase.auth.currentUser?.email as String;
                 context.read<UserBloc>().add(UserEventLoadUser(email));
               }
-              if (state is UserSuccess) {
-                return const MainScreen();
-              }
-              if (state is UserCollecting) {
-                return const Center(
-                    child: CircularProgressIndicator(
-                  backgroundColor: Colors.white,
-                ));
-              }
-              return SizedBox.shrink();
+              return MainScreen();
             }
           },
         ),
@@ -112,50 +97,10 @@ class MyApp extends StatelessWidget {
           '/main/note': (context) => NoteScreen(),
           '/main/categories': (context) => const CategoriesScreen(),
           '/main/tag': (context) => const TagScreen(),
-          '/main/search': (context) => const SearchScreen(),
+          '/main/search': (context) => SearchScreen(),
           '/main/settings': (context) => const SettingScreen(),
         },
       ),
     );
   }
 }
-// BlocBuilder<UserBloc, UserState>
-// (
-// builder: (context, state) {
-// FirebaseService firebase = context.read<UserBloc>().firebaseService;
-// if (firebase.auth.currentUser == null) {
-// return Loginscreen();
-// } else {
-// String email = firebase.auth.currentUser?.email as String;
-// context.read<UserBloc>().add(UserEventLoadUser(email));
-// if (context.read<UserBloc>().state is UserLoading) {
-// return const Center(child: CircularProgressIndicator());
-// } else if (context.read<UserBloc>().state is UserError) {
-// return const Center(child: Text(
-// 'Something went wrong',
-// )
-// );
-// } else {
-// return const MainScreen();
-// }
-// }
-// // return const MainScreen();
-// },
-// )
-// BlocListener<UserBloc, UserState>(
-// listener: (context, state) {
-// var firebase = context.read<UserBloc>().firebaseService;
-//
-// if (firebase.auth.currentUser == null) {
-// Navigator.pushNamedAndRemoveUntil(
-// context, '/login', (route) => false);
-// } else{
-// String email = firebase.auth.currentUser?.email as String;
-// context.read<UserBloc>().add(UserEventLoadUser(email));
-// }
-// if (state is UserLoggedIn) {
-// Navigator.pushNamedAndRemoveUntil(
-// context, '/main', (route) => false);
-// }
-// },
-// )

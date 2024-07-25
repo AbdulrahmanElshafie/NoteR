@@ -66,3 +66,14 @@ final class UserEventLoadUser extends UserEvent{
   UserEventLoadUser(this.email);
 }
 
+final class UserEventTyping extends UserEvent {
+  final String txt;
+
+  UserEventTyping(this.txt);
+}
+
+final class UserEventPrompting extends UserEvent {
+  final String prompt;
+
+  UserEventPrompting(this.prompt);
+}

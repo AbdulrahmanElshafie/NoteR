@@ -25,11 +25,12 @@ class _MainScreenState extends State<MainScreen> {
         centerTitle: true,
       ),
       body: <Widget>[
-        const HomeScreen(),
-        const CategoriesScreen(),
-        const Center(child: CircularProgressIndicator()),
-        const SearchScreen(),
-        const SettingScreen(),
+        HomeScreen(),
+        CategoriesScreen(),
+        Center(child: CircularProgressIndicator()),
+        SearchScreen(),
+        SettingScreen(),
+        SettingScreen(),
       ][crntIndex],
       bottomNavigationBar: SnakeNavigationBar.gradient(
         elevation: 10,
@@ -53,14 +54,30 @@ class _MainScreenState extends State<MainScreen> {
         },
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.sticky_note_2), label: 'All Notes'),
+              icon: Icon(Icons.sticky_note_2),
+              label: 'Notes'
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.category), label: 'Categories'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add Note'),
+              icon: Icon(Icons.category),
+              label: 'GroupeR'
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.search), label: 'Quick Search'),
+              icon: Icon(Icons.add),
+              label: 'NoteR'
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: 'Settings'),
+              icon: Icon(Icons.search),
+              label: 'SearcheR'
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(
+                  Icons.settings),
+              label: 'Settings'
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.chat),
+              label: 'ChateR'
+          ),
         ],
       ),
     );

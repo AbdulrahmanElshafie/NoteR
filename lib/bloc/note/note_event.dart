@@ -26,13 +26,6 @@ final class NoteEventDeleteNote extends NoteEvent {
   NoteEventDeleteNote(this.email, this.note);
 }
 
-// final class NoteEventGetNote extends NoteEvent {
-//   final String email;
-//   final Note note;
-//
-//   NoteEventGetNote(this.email, this.note);
-// }
-
 final class NoteEventAddTag extends NoteEvent {
   final String email;
   final String noteId;

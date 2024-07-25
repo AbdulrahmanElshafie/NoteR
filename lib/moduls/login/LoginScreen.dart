@@ -38,11 +38,11 @@ class Loginscreen extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              textBox(text: 'Email', controller: emailController),
+              textBox(labelText: 'Email', controller: emailController),
               const SizedBox(
                 height: 20,
               ),
-              textBox(text: 'Password', controller: passwordController),
+              textBox(labelText: 'Password', controller: passwordController),
               const SizedBox(
                 height: 20,
               ),

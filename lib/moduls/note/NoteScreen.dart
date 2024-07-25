@@ -8,10 +8,12 @@ import 'package:noter/bloc/tag/tag_bloc.dart';
 import 'package:noter/bloc/user/user_bloc.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
+import 'package:noter/shared/components/GeminiAPI.dart';
 
 class NoteScreen extends StatelessWidget {
   NoteScreen({super.key});
   final QuillController _controller = QuillController.basic();
+  GeminiApi geminiApi = GeminiApi();
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +29,10 @@ class NoteScreen extends StatelessWidget {
             Row(
               children: [
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async {
                     note.modificationDate = DateTime.now();
                     note.content = jsonEncode(_controller.document.toDelta().toJson());
+                    note.embeddings = await geminiApi.embeddingGenerator('${note.title} ${note.content}');
 
                     if(context.read<UserBloc>().user.notes.containsKey(note.noteId)) {
                       context.read<NoteBloc>().add(NoteEventUpdateNote(context.read<UserBloc>().user.email, note));
@@ -240,10 +243,11 @@ class NoteScreen extends StatelessWidget {
                   QuillToolbarCustomButtonOptions(
                     icon: const Icon(Icons.save),
                     tooltip: 'Save',
-                    onPressed: () {
+                    onPressed: () async {
 
                       note.modificationDate = DateTime.now();
                       note.content = jsonEncode(_controller.document.toDelta().toJson());
+                      note.embeddings = await geminiApi.embeddingGenerator('${note.title} ${note.content}');
 
                       if(context.read<UserBloc>().user.notes.containsKey(note.noteId)) {
                         context.read<NoteBloc>().add(NoteEventUpdateNote(context.read<UserBloc>().user.email, note));

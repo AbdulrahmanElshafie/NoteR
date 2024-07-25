@@ -5,7 +5,6 @@
 - GetNote() # read the note / update the note in another device -> In Progress
 - AddTage(tags) # add tags to the note -> In Progress
  */
-
 import 'dart:math';
 
 
@@ -13,6 +12,7 @@ class Note{
   late String noteId, title, content;
   late DateTime creationDate, modificationDate;
   List<String> tags = [];
+  List<double> embeddings = [];
 
 
   Note(){
@@ -28,6 +28,7 @@ class Note{
     content = map['content'];
     creationDate = DateTime.fromMillisecondsSinceEpoch(map['creationDate'].seconds * 1000);
     modificationDate = DateTime.fromMillisecondsSinceEpoch(map['modificationDate'].seconds * 1000);
+    embeddings = map['embeddings'].cast<double>();
   }
 
   void addTag(String tagID){
@@ -40,10 +41,11 @@ class Note{
 
   List<String> getTags() => tags;
 
-  void updateNote(String newTitle, String newContent){
+  void updateNote(String newTitle, String newContent, List<double> newEmbeddings){
     title = newTitle;
     content = newContent;
     modificationDate = DateTime.now();
+    embeddings = newEmbeddings;
   }
 
   void deleteNote(){

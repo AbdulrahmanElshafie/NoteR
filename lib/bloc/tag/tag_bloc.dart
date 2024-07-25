@@ -23,10 +23,6 @@ class TagBloc extends Bloc<TagEvent, TagState> {
       await deleteTag(event, emit);
     });
 
-    // on<TagEventGetTag>((event, emit) async {
-    //     await getTag(event, emit);
-    // });
-
     on<TagEventAddNote>((event, emit) async {
       await addNote(event, emit);
     });
@@ -77,24 +73,6 @@ class TagBloc extends Bloc<TagEvent, TagState> {
 
     emit(TagSuccess('Tag Deleted Successfully!'));
   }
-
-  // Future<Tag> getTag(TagEventGetTag event, Emitter emit) async {
-  //   Tag Tag = Tag();
-  //
-  //   emit(GetTag());
-  //   emit(TagLoading());
-  //
-  //   try {
-  //     var doc = await firebaseService.readTag(event.email, event.Tag.TagId);
-  //
-  //     Tag = Tag.fromMap(doc.data() as Map<String, dynamic>);
-  //     emit(TagLoaded());
-  //     return Tag;
-  //   } catch (e) {
-  //     emit(TagError(e.toString()));
-  //     return Tag;
-  //   }
-  // }
 
   Future<void> addNote(TagEventAddNote event, Emitter emit) async {
     emit(AddTag());

@@ -26,13 +26,6 @@ final class TagEventDeleteTag extends TagEvent {
   TagEventDeleteTag(this.email, this.tag);
 }
 
-// final class TagEventGetTag extends TagEvent {
-//   final String email;
-//   final Tag tag;
-//
-//   TagEventGetTag(this.email, this.tag);
-// }
-
 final class TagEventAddNote extends TagEvent {
   final String email;
   final Note note;

@@ -10,7 +10,9 @@
 - AddNewTag(newTag) # Add eew tag to database and to Tags list -> Done
  */
 
+import 'dart:math';
 import 'package:noter/models/tag.dart';
+import 'package:noter/shared/components/Pair.dart';
 import 'note.dart';
 
 class UserAccount {
@@ -55,5 +57,45 @@ class UserAccount {
   List<Tag> getTags() => tags.values.toList();
 
   List<Note> getNotes() => notes.values.toList();
+
+  List<Pair> calcNotesSimilarity(List<double> promptEmbedding){
+    List<Pair> similarities = [];
+    for(var key in notes.keys){
+      double score = calcCosineSimilarity(notes[key]!.embeddings, promptEmbedding);
+      similarities.add(Pair(score, key));
+    }
+    similarities.sort((a, b) => b.first.compareTo(a.first));
+    return similarities;
+  }
+
+  List<Pair> calcSimilarities(String noteId){
+    List<Pair> similarities = [];
+    for(var key in notes.keys){
+      if(key != noteId){
+        double score = calcCosineSimilarity(notes[key]!.embeddings, notes[noteId]!.embeddings);
+        similarities.add(Pair(score, key));
+      }
+    }
+    similarities.sort((a, b) => b.first.compareTo(a.first));
+    return similarities;
+  }
+
+  double calcMagnitude(List<double> vector){
+    double score = 0.0;
+    for(int i = 0; i < vector.length; i++){
+      score += pow(vector[i], 2);
+    }
+    return sqrt(score);
+  }
+
+  double calcCosineSimilarity(List<double> vector1, List<double> vector2){
+    double magintude1 = calcMagnitude(vector1);
+    double magintude2 = calcMagnitude(vector2);
+    double dotProduct = 0.0;
+    for(int i = 0; i < vector1.length; i++){
+      dotProduct += vector1[i] * vector2[i];
+    }
+    return dotProduct / (magintude1 * magintude2);
+  }
 
 }
