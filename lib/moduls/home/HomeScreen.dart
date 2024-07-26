@@ -27,6 +27,7 @@ class HomeScreen extends StatelessWidget {
           if (userState is UserSuccess) {
             notes = context.read<UserBloc>().user.notes.values.toList();
           }
+          print(notes.length);
           if (notes.isNotEmpty) {
             return ListView.builder(
                 itemCount: notes.length,

@@ -27,7 +27,9 @@ class GeminiApi{
         "Answer the following prompt using only the given resources "
         "and provide the name of the reference at the end of the response. "
         "If there's no answer tell the user that his resources about doesn't have any answer"
-        "and don't provide any reference. "
+        "and don't provide any reference. You can response to chatting prompts normally."
+        "Don't use any markdown formatting in the response, "
+        "keep just a plain text with numbers or bullets only if needed."
         "Prompt: $prompt",
         generationConfig: generationConfig
     ).then((onValue) {

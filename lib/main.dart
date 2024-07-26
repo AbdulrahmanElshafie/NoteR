@@ -29,7 +29,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Gemini.init(apiKey: GEMINI_API);
-
+  // FirebaseService firebaseService = FirebaseService();
+  // firebaseService.initMessaging();
   runApp(const MyApp());
 
 }
@@ -87,16 +88,16 @@ class MyApp extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         routes: {
-          '/signup': (context) => const SignUpScreen(),
+          '/signup': (context) =>  SignUpScreen(),
           '/login': (context) => Loginscreen(),
-          '/main': (context) => const MainScreen(),
-          '/main/home': (context) => const HomeScreen(),
-          '/main/account': (context) => const AccountScreen(),
+          '/main': (context) =>  MainScreen(),
+          '/main/home': (context) =>  HomeScreen(),
+          '/main/account': (context) =>  AccountScreen(),
           '/main/note': (context) => NoteScreen(),
-          '/main/categories': (context) => const CategoriesScreen(),
-          '/main/tag': (context) => const TagScreen(),
+          '/main/categories': (context) =>  CategoriesScreen(),
+          '/main/tag': (context) =>  TagScreen(),
           '/main/search': (context) => SearchScreen(),
-          '/main/settings': (context) => const SettingScreen(),
+          '/main/settings': (context) =>  SettingScreen(),
         },
       ),
     );

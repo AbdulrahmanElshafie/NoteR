@@ -23,8 +23,9 @@ class ChatScreen extends StatelessWidget {
                       isSender: bot
                   )
               );
-            }
 
+              context.read<UserBloc>().add(UserEventClear());
+            }
             return Expanded(
               child: ListView.builder(
                       itemCount: user.messages.length,

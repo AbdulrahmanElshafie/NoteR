@@ -75,6 +75,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   void clearSuggestions(UserEventClear event, Emitter emit) {
     emit(UserClearing());
+    emit(UserSuccess('Clear'));
   }
 
   Future<List<Pair>> getSimilarNotes(String txt) async {

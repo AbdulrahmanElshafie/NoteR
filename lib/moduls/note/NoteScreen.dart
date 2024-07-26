@@ -27,6 +27,7 @@ class NoteScreen extends StatelessWidget {
     _controller.addListener(() {
       if(note.title.length + _controller.document.toPlainText().length > 0){
         context.read<UserBloc>().add(UserEventTyping('${note.title} ${_controller.document.toPlainText()}'));
+        context.read<UserBloc>().add(UserEventClear());
       } else {
         context.read<UserBloc>().add(UserEventClear());
       }
@@ -71,6 +72,7 @@ class NoteScreen extends StatelessWidget {
                       }
                       note.title = value;
                       context.read<UserBloc>().add(UserEventTyping(value));
+                      context.read<UserBloc>().add(UserEventClear());
                     },
                   ),
                 ),
@@ -393,7 +395,6 @@ class NoteScreen extends StatelessWidget {
                                           ),
                                       );
                                     },
-
                                   )
                               ).toList(),
                               child: IconButton(

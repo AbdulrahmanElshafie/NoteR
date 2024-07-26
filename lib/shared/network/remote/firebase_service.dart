@@ -1,13 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:noter/main.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
 import 'package:noter/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseService {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
+  final messaging = FirebaseMessaging.instance;
 
   FirebaseService() {
     Firebase.initializeApp(
@@ -32,7 +36,10 @@ class FirebaseService {
   }
 
   Future<void> resetPassword(String email) async {
-    await auth.sendPasswordResetEmail(email: email);
+    print('in reset pass in firebase');
+    print(email);
+    await auth.sendPasswordResetEmail(email: email.trim());
+    print('after completion');
   }
 
   // Database
@@ -240,4 +247,20 @@ class FirebaseService {
         .doc(noteId)
         .delete();
   }
+
+  // Notifications
+  Future<String> initMessaging() async {
+    await messaging.requestPermission();
+
+    return messaging.getToken().toString();
+  }
+
+  Future<void> saveMessagingToken(String email, String token) async {
+    await db
+        .collection("users")
+        .doc(email)
+        .set({"fcmToken": token}, SetOptions(merge: true));
+  }
+
+
 }
