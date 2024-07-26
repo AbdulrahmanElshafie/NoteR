@@ -37,22 +37,18 @@ dependencies:
   flutter_bloc: ^8.1.6
   flutter_quill_extensions: ^9.4.1
   flutter_quill: ^9.4.1
-  shared_preferences: ^2.2.3
-  flutter_bcrypt: ^1.0.8
   firebase_core: ^3.1.0
   cloud_firestore: ^5.0.1
   firebase_auth: ^5.1.0
-  pointycastle: ^3.9.1
-  dropdown_textfield: ^1.2.0
-  multi_dropdown: ^2.1.4
-  quds_popup_menu: ^0.0.1+1
   flutter_launcher_icons: ^0.13.1
   flutter_snake_navigationbar: ^0.6.1
-  page_transition: ^2.1.0
   group_list_view: ^1.1.1
   splash_view: ^2.0.1
   flutter_gemini: ^2.0.4
-  encrypt: ^5.0.3
+  chat_bubbles: ^1.6.0
+  star_menu: ^4.0.1
+  info_popup: ^4.3.1
+  page_transition: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -71,8 +67,20 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
+  remove_alpha_ios: true
   image_path: "assets/logo.png"
-
+  web:
+    generate: true
+    image_path: "assets/logo.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/logo.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/logo.png"
 # The following section is specific to Flutter packages.
 flutter:
 

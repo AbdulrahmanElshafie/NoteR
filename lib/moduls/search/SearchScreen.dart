@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/user/user_bloc.dart';
@@ -21,6 +20,8 @@ class SearchScreen extends StatelessWidget {
           onChanged: (value) async {
             if (value.isNotEmpty) {
               context.read<UserBloc>().add(UserEventTyping(value));
+            } else {
+              context.read<UserBloc>().add(UserEventClear());
             }
           },
         ),
@@ -29,36 +30,39 @@ class SearchScreen extends StatelessWidget {
         ),
         BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
-            return state is UserTyping
-                ? CircularProgressIndicator()
-                : state is UserTypingSuccess
-                    ? state.suggestions.isNotEmpty
-                        ? Expanded(
-                            child: ListView.builder(
-                                itemCount: state.suggestions.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    child: Card(
-                                        child: ListTile(
-                                          title: Text(notes[state.suggestions[index].second]!.title),
-                                          trailing: const Icon(Icons.chevron_right),
-                                        )),
-                                    onTap: () {
-                                      Navigator.pushNamed(context, '/main/note',
-                                          arguments: notes[state.suggestions[index].second]);
-                                    },
-                                  );
-                                }))
-                        : const Text(
-                            'No Results',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          )
-                    : const Text('suggestions empty');
+            if (state is UserTyping) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if(state is UserTypingSuccess){
+              return state.suggestions.isNotEmpty
+                  ? Expanded(
+                  child: ListView.builder(
+                      itemCount: state.suggestions.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          child: Card(
+                              child: ListTile(
+                                title: Text(notes[state.suggestions[index].second]!.title),
+                                trailing: const Icon(Icons.chevron_right),
+                              )),
+                          onTap: () {
+                            Navigator.pushNamed(context, '/main/note',
+                                arguments: notes[state.suggestions[index].second]);
+                          },
+                        );
+                      }))
+                  : const Text(
+                'No Results',
+                style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              );
+            }
+            return SizedBox.shrink();
           },
         )
       ],
     );
-    ;
   }
 }

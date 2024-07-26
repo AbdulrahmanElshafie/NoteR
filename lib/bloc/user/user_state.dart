@@ -11,6 +11,7 @@ final class UserCollecting extends UserState {}
 final class UserLoggedIn extends UserState {}
 final class UserLoggedOut extends UserState {}
 
+final class UserClearing extends UserState {}
 final class UserTyping extends UserState {}
 final class UserTypingSuccess extends UserState {
   final List<Pair> suggestions;

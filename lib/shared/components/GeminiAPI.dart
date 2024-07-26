@@ -13,8 +13,6 @@ class GeminiApi{
     List<double> embeddings = [];
       await gemini.embedContent(
         txt,
-        // modelName: 'text-embedding-004',
-        // generationConfig: generationConfig
       ).then((onValue) {
         embeddings = onValue!.toList().cast();
       });
@@ -24,15 +22,15 @@ class GeminiApi{
   Future<String> chatGenerator(String prompt, String resources) async {
     String response = '';
     await gemini.text(
-            "Given these resources:"
-            "$resources"
-            "Answer the following prompt using only the given resources "
-            "and if there's no answer tell that there's no answer. "
-            "Prompt: $prompt",
-        modelName: 'gemini-1.0-pro',
+        "Given these resources:"
+        "$resources"
+        "Answer the following prompt using only the given resources "
+        "and provide the name of the reference at the end of the response. "
+        "If there's no answer tell the user that his resources about doesn't have any answer"
+        "and don't provide any reference. "
+        "Prompt: $prompt",
         generationConfig: generationConfig
     ).then((onValue) {
-      print(onValue);
       response = onValue?.output as String;
     });
 

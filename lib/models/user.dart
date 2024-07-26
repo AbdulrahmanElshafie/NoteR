@@ -13,6 +13,7 @@
 import 'dart:math';
 import 'package:noter/models/tag.dart';
 import 'package:noter/shared/components/Pair.dart';
+import 'message.dart';
 import 'note.dart';
 
 class UserAccount {
@@ -20,6 +21,8 @@ class UserAccount {
   late DateTime birthday;
   Map<String, Note> notes = {};
   Map<String, Tag> tags = {};
+  List<Message> messages = [];
+
 
 
   UserAccount(

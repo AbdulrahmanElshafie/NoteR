@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:noter/moduls/categories/CategoriesScreen.dart';
+import 'package:noter/moduls/chat/ChatScreen.dart';
 import 'package:noter/moduls/home/HomeScreen.dart';
 import 'package:noter/moduls/search/SearchScreen.dart';
 import 'package:noter/moduls/setting/SettingScreen.dart';
@@ -26,10 +27,10 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: <Widget>[
         HomeScreen(),
-        CategoriesScreen(),
+        // CategoriesScreen(),
         Center(child: CircularProgressIndicator()),
         SearchScreen(),
-        SettingScreen(),
+        ChatScreen(),
         SettingScreen(),
       ][crntIndex],
       bottomNavigationBar: SnakeNavigationBar.gradient(
@@ -48,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         onTap: (index) {
           crntIndex = index;
           setState(() {});
-          if (crntIndex == 2) {
+          if (crntIndex == 1) {
             Navigator.pushNamed(context, '/main/note', arguments: Note());
           }
         },
@@ -57,10 +58,10 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icon(Icons.sticky_note_2),
               label: 'Notes'
           ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.category),
-              label: 'GroupeR'
-          ),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.category),
+          //     label: 'GroupeR'
+          // ),
           BottomNavigationBarItem(
               icon: Icon(Icons.add),
               label: 'NoteR'
@@ -70,13 +71,13 @@ class _MainScreenState extends State<MainScreen> {
               label: 'SearcheR'
           ),
           BottomNavigationBarItem(
+              icon: Icon(Icons.chat),
+              label: 'ChateR'
+          ),
+          BottomNavigationBarItem(
               icon: Icon(
                   Icons.settings),
               label: 'Settings'
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat),
-              label: 'ChateR'
           ),
         ],
       ),

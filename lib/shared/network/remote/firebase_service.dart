@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_bcrypt/flutter_bcrypt.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
 import 'package:noter/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:encrypt/encrypt.dart';
 
 class FirebaseService {
   final auth = FirebaseAuth.instance;
@@ -18,52 +16,15 @@ class FirebaseService {
   }
 
   // Authentication
-  Future<List<String>> register(String email, String password) async {
-    final key = Key.fromSecureRandom(32);
-    final salt = IV.fromLength(16);
-
-    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
-
-    final encrypted = encrypter.encrypt(password, iv: salt);
-
-    // String salt = await FlutterBcrypt.salt();
-    // String passwordHash =
-    //     await FlutterBcrypt.hashPw(password: password, salt: salt);
-
+  Future<void> register(String email, String password) async {
     await auth.createUserWithEmailAndPassword(
-        email: email, password: encrypted.base64);
+        email: email, password: password);
 
-    return [salt.base64, key.base64];
   }
 
-  Future<String> getSalt(String email) async {
-    String salt = await db.collection('salts').doc(email).get().then((value) {
-      return value.data()?['salt'];
-    });
-    return salt;
-  }
-
-  Future<String> getKey(String email) async {
-    String salt = await db.collection('salts').doc(email).get().then((value) {
-      return value.data()?['key'];
-    });
-    return salt;
-  }
-
-  Future<void> login(String email, String password, String saltBase64,
-      String keyBase64) async {
-    final key = Key.fromBase64(keyBase64);
-    final salt = IV.fromBase64(saltBase64);
-
-    final encrypter = Encrypter(AES(key));
-
-    final encrypted = encrypter.encrypt(password, iv: salt);
-
-    // String passwordHash =
-    //     await FlutterBcrypt.hashPw(password: password, salt: salt);
-
+  Future<void> login(String email, String password) async {
     await auth.signInWithEmailAndPassword(
-        email: email, password: encrypted.base64);
+        email: email, password: password);
   }
 
   Future<void> logout() async {
@@ -80,8 +41,6 @@ class FirebaseService {
   Future<void> addUserToDb(
       String name,
       String email,
-      String salt,
-      String key,
       String gender,
       DateTime birthday,
       String location,
@@ -94,8 +53,6 @@ class FirebaseService {
       "location": location,
       "language": language,
     });
-
-    await db.collection('salts').doc(email).set({'salt': salt, 'key': key});
   }
 
   Future<void> addTagToDb(String email, Tag tag) async {

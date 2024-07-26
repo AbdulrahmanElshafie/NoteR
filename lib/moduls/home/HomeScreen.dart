@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -16,7 +14,8 @@ class HomeScreen extends StatelessWidget {
     return Stack(
       // mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        BlocBuilder<NoteBloc, NoteState>(builder: (context, state) {
+        BlocBuilder<NoteBloc, NoteState>(
+          builder: (context, state) {
           UserState userState = context.read<UserBloc>().state;
           List<Note> notes = [];
           if (userState is UserCollecting) {
@@ -35,11 +34,11 @@ class HomeScreen extends StatelessWidget {
                   return GestureDetector(
                     child: Card(
                         child: ListTile(
-                      title: Text(notes[index].title),
-                      subtitle: Text(
-                          Document.fromJson(jsonDecode(notes[index].content))
-                              .toPlainText()),
-                      trailing: const Icon(Icons.chevron_right),
+                        title: Text(notes[index].title),
+                        subtitle: Text(
+                              Document.fromJson(jsonDecode(notes[index].content))
+                                  .toPlainText()),
+                          trailing: const Icon(Icons.chevron_right),
                     )),
                     onTap: () {
                       Navigator.pushNamed(context, '/main/note',

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:noter/models/note.dart';
 import 'package:noter/models/tag.dart';
 import 'package:noter/shared/components/GeminiAPI.dart';
@@ -61,9 +64,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       await getNotesSimilarity(event, emit);
     });
 
+    on<UserEventClear>((event, emit) {
+      clearSuggestions(event, emit);
+    });
+
     on<UserEventPrompting>((event, emit) async {
       await getResponse(event, emit);
     });
+  }
+
+  void clearSuggestions(UserEventClear event, Emitter emit) {
+    emit(UserClearing());
   }
 
   Future<List<Pair>> getSimilarNotes(String txt) async {
@@ -78,6 +89,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
     try {
       suggestions = await getSimilarNotes(event.txt);
+      for(int i = 0; i < suggestions.length; i++){
+        if(suggestions[i].first < 0.5){
+          suggestions.removeAt(i);
+          i--;
+        }
+      }
     } catch (e) {
       emit(UserError(e.toString()));
       return;
@@ -85,7 +102,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
     emit(UserTypingSuccess(suggestions.length < 20
         ? suggestions
-        : suggestions.getRange(0, 20).toList()));
+        : suggestions.sublist(0, 20)));
     // emit(UserSuccess('success'));
   }
 
@@ -97,15 +114,16 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     String response = '';
     try {
       await getSimilarNotes(event.prompt).then((onValue) {
-        suggestions = onValue.getRange(0, 5).toList();
+        suggestions = onValue.sublist(0, 5);
       });
 
       String resources = '';
 
       for (int i = 0; i < suggestions.length; i++) {
         Note? note = user.notes[suggestions[i].second];
-        resources += '${note?.title} ${note?.content}\n\n\n';
+        resources += '${note?.title} ${Document.fromJson(jsonDecode(note!.content)).toPlainText()}';
       }
+
       response = await geminiApi.chatGenerator(event.prompt, resources);
     } catch (e) {
       emit(UserError(e.toString()));
@@ -169,11 +187,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   Future<void> login(UserEventLogin event, Emitter emit) async {
     emit(UserLoading());
-    String salt, key;
     try {
-      salt = await firebaseService.getSalt(event.email);
-      key = await firebaseService.getKey(event.email);
-      await firebaseService.login(event.email, event.password, salt, key);
+      await firebaseService.login(event.email, event.password);
 
       var userData = await firebaseService.getUserInfo(event.email);
       user = UserAccount.fromMap(userData.data() as Map<String, dynamic>);
@@ -191,10 +206,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   Future<void> register(UserEventRegister event, Emitter emit) async {
     emit(UserLoading());
-    String salt, key;
     try {
-      [salt, key] = await firebaseService.register(event.email, event.password);
-      await firebaseService.addUserToDb(event.name, event.email, salt, key,
+      await firebaseService.addUserToDb(event.name, event.email,
           event.gender, event.birthday, event.location, event.language);
 
       user = UserAccount(

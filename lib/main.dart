@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +14,7 @@ import 'package:noter/moduls/home/HomeScreen.dart';
 import 'package:noter/moduls/note/NoteScreen.dart';
 import 'package:noter/moduls/tag/TagScreen.dart';
 import 'package:noter/moduls/mainscreen/MainScreen.dart';
+import 'package:noter/shared/components/constants.dart';
 import 'package:noter/shared/network/remote/firebase_service.dart';
 import 'package:page_transition/page_transition.dart';
 // import 'package:splash_view/source/presentation/pages/splash_view.dart';
@@ -23,16 +22,15 @@ import 'package:page_transition/page_transition.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'bloc/user/user_bloc.dart';
 import 'moduls/setting/SettingScreen.dart';
-import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Gemini.init(apiKey: 'AIzaSyAEBjApRLFyoXX-R9I73PKRxR9UnynASnw');
+  Gemini.init(apiKey: GEMINI_API);
 
-  runApp(MyApp());
+  runApp(const MyApp());
 
 }
 
@@ -46,7 +44,7 @@ Widget start() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
