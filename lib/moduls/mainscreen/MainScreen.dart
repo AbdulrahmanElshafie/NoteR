@@ -1,11 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:noter/moduls/categories/CategoriesScreen.dart';
 import 'package:noter/moduls/chat/ChatScreen.dart';
 import 'package:noter/moduls/home/HomeScreen.dart';
 import 'package:noter/moduls/search/SearchScreen.dart';
 import 'package:noter/moduls/setting/SettingScreen.dart';
+import '../../bloc/user/user_bloc.dart';
 import '../../models/note.dart';
 
 class MainScreen extends StatefulWidget {
@@ -47,6 +50,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         currentIndex: crntIndex,
         onTap: (index) {
+          context.read<UserBloc>().add(UserEventUpdateNotes());
           crntIndex = index;
           setState(() {});
           if (crntIndex == 1) {

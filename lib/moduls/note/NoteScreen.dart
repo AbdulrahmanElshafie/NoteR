@@ -357,7 +357,7 @@ class NoteScreen extends StatelessWidget {
                     if (state.suggestions.isNotEmpty) {
                       bool hover = false;
                       List<Pair> suggestions;
-                      state.suggestions.length > 5 ? suggestions = state.suggestions.sublist(0, 5) : suggestions = state.suggestions;
+                      state.suggestions.length > 5 ? suggestions = state.suggestions.sublist(1, 6) : suggestions = state.suggestions;
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

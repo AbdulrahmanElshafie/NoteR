@@ -200,6 +200,9 @@ class _SettingScreenState extends State<SettingScreen> {
             ),
           ],
         ),
+        SizedBox(
+          height: 35
+        ),
         Text(
             'Send me your feedback and suggestions. Contact Info: \n'
                 'Email: sabdo6177@gmail.com \n'

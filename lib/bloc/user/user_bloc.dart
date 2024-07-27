@@ -110,9 +110,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       return;
     }
 
-    emit(UserTypingSuccess(suggestions.length < 20
+    emit(UserTypingSuccess(suggestions.length < 10
         ? suggestions
-        : suggestions.sublist(0, 20)));
+        : suggestions.sublist(0, 10)));
     // emit(UserSuccess('success'));
   }
 
