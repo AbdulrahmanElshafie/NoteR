@@ -201,8 +201,8 @@ class _SettingScreenState extends State<SettingScreen> {
           ],
         ),
         Text(
-            'Send me your feedback on'
-                'Email: sabdo6177@gmail.com'
+            'Send me your feedback and suggestions. Contact Info: \n'
+                'Email: sabdo6177@gmail.com \n'
                 'WhatsApp: +20 1018625142'
         )
       ],

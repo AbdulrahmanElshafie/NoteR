@@ -46,12 +46,12 @@ class FirebaseService {
 
   // Creation
   Future<void> addUserToDb(
-      String name,
-      String email,
-      String gender,
-      DateTime birthday,
-      String location,
-      String language) async {
+      {required String name,
+      required String email,
+      required String gender,
+      required DateTime birthday,
+      required String location,
+      required String language}) async {
     await db.collection("users").doc(email).set({
       "name": name,
       "email": email,

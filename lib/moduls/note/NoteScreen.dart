@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -51,6 +52,7 @@ class NoteScreen extends StatelessWidget {
                       context.read<UserBloc>().user.addNote(note);
                       context.read<NoteBloc>().add(NoteEventAddNote(context.read<UserBloc>().user.email, note));
                     }
+                    context.read<UserBloc>().add(UserEventUpdateNotes());
                     Navigator.pop(context);
                   },
                   icon: const Icon(
@@ -269,7 +271,7 @@ class NoteScreen extends StatelessWidget {
                         context.read<UserBloc>().user.addNote(note);
                         context.read<NoteBloc>().add(NoteEventAddNote(context.read<UserBloc>().user.email, note));
                       }
-
+                      context.read<UserBloc>().add(UserEventUpdateNotes());
                     },
                   ),
                   QuillToolbarCustomButtonOptions(

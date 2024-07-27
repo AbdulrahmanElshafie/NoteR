@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
           if (userState is UserSuccess) {
             notes = context.read<UserBloc>().user.notes.values.toList();
           }
-          print(notes.length);
           if (notes.isNotEmpty) {
             return ListView.builder(
                 itemCount: notes.length,
@@ -38,7 +37,10 @@ class HomeScreen extends StatelessWidget {
                         title: Text(notes[index].title),
                         subtitle: Text(
                               Document.fromJson(jsonDecode(notes[index].content))
-                                  .toPlainText()),
+                                  .toPlainText(),
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                        ),
                           trailing: const Icon(Icons.chevron_right),
                     )),
                     onTap: () {

@@ -78,3 +78,5 @@ final class UserEventPrompting extends UserEvent {
 
   UserEventPrompting(this.prompt);
 }
+
+final class UserEventUpdateNotes extends UserEvent {}

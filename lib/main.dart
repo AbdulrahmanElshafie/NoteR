@@ -29,8 +29,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Gemini.init(apiKey: GEMINI_API);
-  // FirebaseService firebaseService = FirebaseService();
-  // firebaseService.initMessaging();
+  FirebaseService firebaseService = FirebaseService();
+  firebaseService.initMessaging();
   runApp(const MyApp());
 
 }

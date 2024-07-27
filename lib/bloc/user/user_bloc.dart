@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -71,6 +72,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<UserEventPrompting>((event, emit) async {
       await getResponse(event, emit);
     });
+
+    on<UserEventUpdateNotes>((event, emit) {
+      updateNotes(event, emit);
+    });
+  }
+
+  void updateNotes(UserEventUpdateNotes event, Emitter emit) {
+    emit(UserSuccess('Notes Updated'));
   }
 
   void clearSuggestions(UserEventClear event, Emitter emit) {
@@ -178,7 +187,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       collectNotes(event.email);
 
-      collectTags(event.email);
+      // collectTags(event.email);
     } catch (e) {
       emit(UserError(e.toString()));
       return;
@@ -196,8 +205,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       collectNotes(event.email);
 
-      collectTags(event.email);
+      // collectTags(event.email);
     } catch (e) {
+      print(e);
       emit(UserError(e.toString()));
       return;
     }
@@ -208,8 +218,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> register(UserEventRegister event, Emitter emit) async {
     emit(UserLoading());
     try {
-      await firebaseService.addUserToDb(event.name, event.email,
-          event.gender, event.birthday, event.location, event.language);
+      await firebaseService.addUserToDb(name: event.name, email:event.email,
+          gender: event.gender, birthday: event.birthday, location: event.location, language: event.language);
 
       user = UserAccount(
           event.gender, event.birthday, event.location, event.language,
@@ -276,7 +286,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserError(e.toString()));
       return;
     }
-    emit(UserSuccess('All good!'));
+    // emit(UserSuccess('All good!'));
   }
 
   Future<void> getTags(UserEventGetTags event, Emitter emit) async {
